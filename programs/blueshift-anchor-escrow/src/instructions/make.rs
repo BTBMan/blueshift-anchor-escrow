@@ -13,7 +13,7 @@ pub struct Make<'info> {
     #[account(mut)]
     pub maker: Signer<'info>,
 
-    // 初始化托管 PDA 账户
+    // 初始化托管 PDA 数据账户, 主要用来存放所需要的数据
     #[account(
         init,
         payer = maker, // 指定创建账户所花费用的支付者
@@ -35,7 +35,7 @@ pub struct Make<'info> {
     )]
     pub mint_b: InterfaceAccount<'info, Mint>,
 
-    //  创建者所想换取的 Token A 的 ATA 账户
+    // 创建者所想换取的 Token A 的 ATA 账户
     #[account(
         mut,
         associated_token::mint = mint_a, // 约束 ATA 账户是和 mint_a 绑定的,
@@ -44,11 +44,13 @@ pub struct Make<'info> {
     )]
     pub maker_ata_a: InterfaceAccount<'info, TokenAccount>,
 
+    // 创建和初始化资金托管 ATA 账户, 关联 mint_a 账户, 用来存取 token_a
+    // 不需要 init, 因为 ATA 账户的大小是固定的(固定的几个字段, 如: amount, owner 等), Associated Token Program 会自动分配大小
     #[account(
         init,
         payer = maker,
         associated_token::mint = mint_a,
-        associated_token::authority = escrow,
+        associated_token::authority = escrow, // 约束这是 escrow 的 ATA 账户
         associated_token::token_program = token_program
     )]
     pub vault: InterfaceAccount<'info, TokenAccount>,
