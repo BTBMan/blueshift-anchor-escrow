@@ -5,45 +5,36 @@ use anchor_spl::{
     token_interface::{transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked},
 };
 
-// 定义 make 所需的账户列表
 #[derive(Accounts)]
-#[instruction(seed: u64)] // 用来获取指令中的参数, 这里只获取了 seed 传参
+#[instruction(seed: u64)]
 pub struct Make<'info> {
-    // 签名账户, 即创建托管的账户
     #[account(mut)]
     pub maker: Signer<'info>,
-
-    // 初始化托管 PDA 账户
     #[account(
         init,
-        payer = maker, // 指定创建账户所花费用的支付者
-        space = Escrow::INIT_SPACE + Escrow::DISCRIMINATOR.len(), // 默认的 8 个字节的判别符空间 8 替换为 Escrow::DISCRIMINATOR.len()
-        seeds = [b"escrow", maker.key().as_ref(), seed.to_le_bytes().as_ref()], // 通过 maker 和自定义传入的 seed 来生成 pda
+        payer = maker,
+        space = Escrow::INIT_SPACE + Escrow::DISCRIMINATOR.len(),
+        seeds = [b"escrow", maker.key().as_ref(), seed.to_le_bytes().as_ref()],
         bump,
     )]
     pub escrow: Account<'info, Escrow>,
 
-    // 存入的 Token A 的 mint 账户
+    /// Token Accounts
     #[account(
-        mint::token_program = token_program // 约束 mint_a 的 token_program 必须是 token_program(SPL Token Program)
+        mint::token_program = token_program
     )]
     pub mint_a: InterfaceAccount<'info, Mint>,
-
-    // 换取的 Token B 的 mint 账户
     #[account(
         mint::token_program = token_program
     )]
     pub mint_b: InterfaceAccount<'info, Mint>,
-
-    //  创建者所想换取的 Token A 的 ATA 账户
     #[account(
         mut,
-        associated_token::mint = mint_a, // 约束 ATA 账户是和 mint_a 绑定的,
-        associated_token::authority = maker, // 约束这是创建者的 ATA 账户
-        associated_token::token_program = token_program // 约束 associated token program 创建账户应该使用那个 token program 来管理这个账户
+        associated_token::mint = mint_a,
+        associated_token::authority = maker,
+        associated_token::token_program = token_program
     )]
     pub maker_ata_a: InterfaceAccount<'info, TokenAccount>,
-
     #[account(
         init,
         payer = maker,
@@ -53,10 +44,10 @@ pub struct Make<'info> {
     )]
     pub vault: InterfaceAccount<'info, TokenAccount>,
 
-    // Programs
-    pub associated_token_program: Program<'info, AssociatedToken>, // ATA 程序(因为需要定义 ATA 账户, 所以必须显示定义 AssociatedTokenAccount 程序)
-    pub token_program: Interface<'info, TokenInterface>,           // SPL Token 程序
-    pub system_program: Program<'info, System>,                    // 系统程序
+    /// Programs
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub token_program: Interface<'info, TokenInterface>,
+    pub system_program: Program<'info, System>,
 }
 
 impl<'info> Make<'info> {

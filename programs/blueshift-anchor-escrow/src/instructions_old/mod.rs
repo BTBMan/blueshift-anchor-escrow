@@ -1,9 +1,6 @@
-// 声明所有的指令
 pub mod make;
 pub mod refund;
 pub mod take;
-
-// 导出所有的指令
 pub use make::*;
 pub use refund::*;
 pub use take::*;

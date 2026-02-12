@@ -1,14 +1,11 @@
 use anchor_lang::prelude::*;
 
-// 声明所有的模块
 mod errors;
 mod instructions;
 mod state;
-
-// 导入所有的指令
 use instructions::*;
 
-declare_id!("Ew2CvRfUbSSUfe5DurrYJm1xXCxhKskHoB7GkL1Gcggj");
+declare_id!("22222222222222222222222222222222222222222222");
 
 #[program]
 pub mod blueshift_anchor_escrow {
