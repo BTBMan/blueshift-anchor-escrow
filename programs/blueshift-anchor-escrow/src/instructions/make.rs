@@ -35,7 +35,7 @@ pub struct Make<'info> {
     )]
     pub mint_b: InterfaceAccount<'info, Mint>,
 
-    // 创建者所想换取的 Token A 的 ATA 账户
+    // 创建者所存入的 Token A 的 ATA 账户
     #[account(
         mut,
         associated_token::mint = mint_a, // 约束 ATA 账户是和 mint_a 绑定的,
@@ -62,21 +62,21 @@ pub struct Make<'info> {
 }
 
 impl<'info> Make<'info> {
-    /// # Create the Escrow
+    // 为 escrow 数据账户填充所需要的数据
     fn populate_escrow(&mut self, seed: u64, amount: u64, bump: u8) -> Result<()> {
         self.escrow.set_inner(Escrow {
-            seed,
-            maker: self.maker.key(),
-            mint_a: self.mint_a.key(),
-            mint_b: self.mint_b.key(),
-            receive: amount,
-            bump,
+            seed,                      // 自定义种子
+            maker: self.maker.key(),   // 托管账户创建者地址
+            mint_a: self.mint_a.key(), // token A 的 mint 账户地址
+            mint_b: self.mint_b.key(), // token B 的 mint 账户地址
+            receive: amount,           // 期望接收的 token B 数量
+            bump,                      // 缓存的 bump 值
         });
 
         Ok(())
     }
 
-    /// # Deposit the tokens
+    // 把 token A 转账到 vault ATA 账户中
     fn deposit_tokens(&self, amount: u64) -> Result<()> {
         transfer_checked(
             CpiContext::new(
@@ -97,15 +97,15 @@ impl<'info> Make<'info> {
 }
 
 pub fn handler(ctx: Context<Make>, seed: u64, receive: u64, amount: u64) -> Result<()> {
-    // Validate the amount
+    // 验证存入的 token A 和期望换取的 token B 的数量都必须大于 0
     require_gt!(receive, 0, EscrowError::InvalidAmount);
     require_gt!(amount, 0, EscrowError::InvalidAmount);
 
-    // Save the Escrow Data
+    // 存数据
     ctx.accounts
         .populate_escrow(seed, receive, ctx.bumps.escrow)?;
 
-    // Deposit Tokens
+    // 存入 token A
     ctx.accounts.deposit_tokens(amount)?;
 
     Ok(())
