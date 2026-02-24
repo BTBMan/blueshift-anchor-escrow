@@ -40,8 +40,7 @@ pub struct Refund<'info> {
 
     // 创建者所存入的 Token A 的 ATA 账户
     #[account(
-        init_if_needed,
-        payer = maker,
+        mut,
         associated_token::mint = mint_a,
         associated_token::authority = maker,
         associated_token::token_program = token_program
