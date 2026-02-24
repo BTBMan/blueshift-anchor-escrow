@@ -8,7 +8,11 @@ mod state;
 // 导入所有的指令
 use instructions::*;
 
-declare_id!("Ew2CvRfUbSSUfe5DurrYJm1xXCxhKskHoB7GkL1Gcggj");
+// 运行本地 test 时使用
+// declare_id!("Ew2CvRfUbSSUfe5DurrYJm1xXCxhKskHoB7GkL1Gcggj");
+
+// blueshift 平台提交使用
+declare_id!("22222222222222222222222222222222222222222222");
 
 #[program]
 pub mod blueshift_anchor_escrow {

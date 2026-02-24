@@ -1,7 +1,7 @@
 use crate::{errors::EscrowError, state::Escrow};
 use anchor_lang::prelude::*;
 use anchor_spl::{
-    // associated_token::AssociatedToken,
+    associated_token::AssociatedToken,
     token_interface::{
         close_account, transfer_checked, CloseAccount, Mint, TokenAccount, TokenInterface,
         TransferChecked,
@@ -39,8 +39,11 @@ pub struct Refund<'info> {
     pub vault: InterfaceAccount<'info, TokenAccount>,
 
     // 创建者所存入的 Token A 的 ATA 账户
+    // 使用 init_if_needed 是因为: maker 存入全部 Token A 后, 可能会关闭空的 ATA 账户来回收租金
+    // 所以 refund 时 maker_ata_a 不一定存在, 需要在不存在时重新创建
     #[account(
-        mut,
+        init_if_needed,
+        payer = maker,
         associated_token::mint = mint_a,
         associated_token::authority = maker,
         associated_token::token_program = token_program
@@ -48,7 +51,7 @@ pub struct Refund<'info> {
     pub maker_ata_a: InterfaceAccount<'info, TokenAccount>,
 
     // 账户所需要的程序
-    // pub associated_token_program: Program<'info, AssociatedToken>,
+    pub associated_token_program: Program<'info, AssociatedToken>, // init_if_needed 需要 ATA 程序
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
 }
