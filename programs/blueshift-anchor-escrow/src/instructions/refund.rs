@@ -1,7 +1,7 @@
 use crate::{errors::EscrowError, state::Escrow};
 use anchor_lang::prelude::*;
 use anchor_spl::{
-    associated_token::AssociatedToken,
+    // associated_token::AssociatedToken,
     token_interface::{
         close_account, transfer_checked, CloseAccount, Mint, TokenAccount, TokenInterface,
         TransferChecked,
@@ -48,7 +48,7 @@ pub struct Refund<'info> {
     pub maker_ata_a: InterfaceAccount<'info, TokenAccount>,
 
     // 账户所需要的程序
-    pub associated_token_program: Program<'info, AssociatedToken>,
+    // pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
 }
